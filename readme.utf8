@@ -1,0 +1,41 @@
+Program využívá nativní implementace CORBA v jazyce Java.
+
+Informace o licenci v souboru LICENSE.
+
+Knihovny potřebné k přeložení programu umístěné ve složce lib/:
+  JGoodies Forms (forms.jar):
+	http://www.jgoodies.com/freeware/forms/
+
+  JavaDB (Apache Derby), součástí Java6 (možná nutno nastavit
+  classpath) (derby.jar):
+	http://developers.sun.com/javadb/
+	http://db.apache.org/derby/
+
+Přeložení programu:
+  # přeložení IDL souboru do Java implementace rozhraní
+  cd src
+  idlj -fall pdi.idl
+  cd ..
+  # přeložení programu v jazyce java
+  ant
+
+Datový zdroj:
+  Program si ukládá data do adresáře .PDI v domovském
+  adresáři uživatele (adresář nutno založit ručně). Program
+  si při prvním spuštění vytvoří datové soubory a založí
+  potřebné tabulky a přidá první uživatele systému.
+
+Spuštění:
+  orbd -ORBInitialPort 1050 &
+  java -jar pdi-server.jar -ORBInitialPort 1050 &
+  java -jar pdi-client.jar -ORBInitialPort 1050 &
+
+Výchozí uživatelé:
+  test/test	uživatel s nejnižšími právy, může změnit
+		pouze svoje heslo, nevidí ostatní uživatele
+		systému
+
+  administrator/12345
+		uživatel s administrátorskými právy,
+		může to co běžný uživatel a navíc přidávat,
+		editovat a mazat jiné uživatele

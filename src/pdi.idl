@@ -1,0 +1,36 @@
+module PdiRemoteAuth {
+	struct User {
+		string username;
+		string password;
+		string rights;
+	};
+	
+	exception UnknownUserOrBadPass{};
+	exception NoEnoughPrivileges{};
+	exception UserNotLoggedIn{};
+	
+	typedef sequence<User> Users;
+	typedef string AuthCookie;
+	
+	interface Auth {
+		AuthCookie tryAuth(in string username, in string password)
+			raises(UnknownUserOrBadPass);
+			
+		Users getUsers(in AuthCookie cookie)
+			raises(NoEnoughPrivileges, UserNotLoggedIn);
+			
+		boolean changeCredentials(in AuthCookie cookie, in string user,
+			in string newuser, in string newpass, in string newrights)
+			raises(NoEnoughPrivileges, UserNotLoggedIn);
+			
+		boolean addUser(in AuthCookie cookie, in string username,
+			in string pass, in string rights) 
+			raises(NoEnoughPrivileges, UserNotLoggedIn);
+			
+		boolean logout(in AuthCookie cookie) raises(UserNotLoggedIn);
+		
+		boolean removeUser(in AuthCookie cooki, in string username) 
+			raises(NoEnoughPrivileges, UserNotLoggedIn);
+	};
+
+};

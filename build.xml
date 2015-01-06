@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="PDI" default="compile" basedir=".">
+  <description>Builds and hfnis project.</description>
+  <property name="src-client" location="src/client"/>
+  <property name="src-server" location="src/server"/>
+  <property name="src-corba" location="src/PdiRemoteAuth"/>
+
+  <property name="jar-client" value="pdi-client.jar"/> 
+  <property name="jar-server" value="pdi-server.jar"/>
+  <property name="jar-corba"  value="pdi-corba.jar"/>
+
+  <property name="build" location="bin"/>
+  <property name="default.javac.source" value="1.6"/>
+  <property name="default.javac.target" value="1.6"/>
+  <property name="debug" value="true"/>
+
+  <path id="project.classpath">
+    <fileset dir="lib">
+      <include name="*.jar"/>
+    </fileset>
+  </path>
+
+  <target name="init" depends="clean">
+    <mkdir dir="${build}"/>
+    <mkdir dir="${build}/server"/>
+    <mkdir dir="${build}/client"/>
+    <mkdir dir="${build}/corba"/>
+  </target>
+
+  <target name="corba">
+    <javac srcdir="${src-corba}" destdir="${build}/corba" classpathref="project.classpath" debug="${debug}"/>
+    <jar jarfile="./lib/${jar-corba}" basedir="${build}/corba"/>
+  </target>
+
+  <target name="server" depends="corba">
+    <javac srcdir="${src-server}" destdir="${build}/server" classpathref="project.classpath" debug="${debug}"/>
+  </target>
+
+  <target name="client" depends="corba">
+    <javac srcdir="${src-client}" destdir="${build}/client" classpathref="project.classpath" debug="${debug}"/>
+  </target>
+
+  <target name="compile" depends="init,server,client">
+    
+    <jar jarfile="./${jar-server}" basedir="${build}/server">
+      <manifest>
+	<attribute name="Main-Class" value="server.Server"/>
+        <attribute name="Class-Path" value="lib/derby.jar lib/pdi-corba.jar"/>
+      </manifest>
+    </jar>
+    
+    <jar jarfile="./${jar-client}" basedir="${build}/client">
+      <manifest>
+        <attribute name="Main-Class" value="client.Client"/>
+        <attribute name="Class-Path" value="lib/forms.jar lib/pdi-corba.jar"/>
+      </manifest>
+    </jar>
+  </target>
+  
+  <target name="run">
+    <property environment="env"/>
+    <java jar="${jar}" fork="true" failonerror="true" maxmemory="128M">  
+    </java>
+  </target>
+
+  <target name="clean">
+    <delete dir="${build}"/>
+    <delete file="pdi-server.jar"/>
+    <delete file="pdi-client.jar"/>
+    <delete file="lib/pdi-corba.jar"/>
+  </target>
+
+</project>
+
